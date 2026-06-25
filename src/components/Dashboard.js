@@ -36,6 +36,7 @@ export default function Dashboard({ initialJobs }) {
   const [badgeFilter, setBadgeFilter] = useState('all'); // 'all', 'hot', 'new'
   const [activeTab, setActiveTab] = useState('info'); // 'info', 'applicants'
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [applicantSearch, setApplicantSearch] = useState('');
 
   // Debounce search input
   useEffect(() => {
@@ -44,6 +45,11 @@ export default function Dashboard({ initialJobs }) {
     }, 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
+
+  // Reset applicant search filter when job selection changes
+  useEffect(() => {
+    setApplicantSearch('');
+  }, [selectedJobId]);
 
   // SWR Dynamic Data Fetching
   const { data: filteredJobs = [], error, isValidating } = useSWR(
@@ -88,6 +94,24 @@ export default function Dashboard({ initialJobs }) {
   const displayJob = useMemo(() => {
     return filteredJobs.find(job => job.id_job === selectedJobId) || filteredJobs[0] || null;
   }, [filteredJobs, selectedJobId]);
+
+  // Filter applicants for the selected job in real-time
+  const filteredApplicants = useMemo(() => {
+    if (!displayJob || !displayJob.job_applications) return [];
+    if (!applicantSearch) return displayJob.job_applications;
+
+    const query = applicantSearch.toLowerCase();
+    return displayJob.job_applications.filter(app => {
+      return (
+        app.name?.toLowerCase().includes(query) ||
+        app.email?.toLowerCase().includes(query) ||
+        app.phone_number?.toLowerCase().includes(query) ||
+        app.application_id?.toString().includes(query) ||
+        app.status?.toLowerCase().includes(query) ||
+        app.relative?.toLowerCase().includes(query)
+      );
+    });
+  }, [displayJob, applicantSearch]);
 
   // Stats calculation
   const totalJobsCount = initialJobs.length;
@@ -340,13 +364,34 @@ export default function Dashboard({ initialJobs }) {
                 {/* Applicants Tab */}
                 {activeTab === 'applicants' && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-zinc-200/80 rounded-xl p-4 shadow-3xs">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                        Applications Received: <span className="text-zinc-900 font-extrabold">{displayJob.job_applications?.length || 0}</span>
+                        Applications: <span className="text-zinc-900 font-extrabold">{filteredApplicants.length}</span> / {displayJob.job_applications?.length || 0} total
                       </h3>
+                      
+                      {/* Search box for applicants */}
+                      <div className="relative flex items-center w-full sm:w-64">
+                        <Search className="absolute left-2.5 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
+                        <input 
+                          type="text" 
+                          placeholder="Search candidate name, email, phone..." 
+                          value={applicantSearch}
+                          onChange={e => setApplicantSearch(e.target.value)}
+                          className="w-full h-8 pl-8 pr-7 rounded-md bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition"
+                        />
+                        {applicantSearch && (
+                          <button 
+                            onClick={() => setApplicantSearch('')}
+                            className="absolute right-2 p-0.5 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    
                     <ApplicantsList 
-                      applications={displayJob.job_applications} 
+                      applications={filteredApplicants} 
                       onSelectCandidate={setSelectedCandidate}
                     />
                   </div>
