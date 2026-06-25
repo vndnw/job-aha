@@ -41,13 +41,20 @@ export default function JobDetailsContainer({
 
     const query = applicantSearch.toLowerCase();
     return job.job_applications.filter(app => {
+      const name = app.name ? String(app.name).toLowerCase() : '';
+      const email = app.email ? String(app.email).toLowerCase() : '';
+      const phone = app.phone_number ? String(app.phone_number).toLowerCase() : '';
+      const appId = app.application_id ? String(app.application_id).toLowerCase() : '';
+      const status = app.status ? String(app.status).toLowerCase() : '';
+      const relative = app.relative ? String(app.relative).toLowerCase() : '';
+
       return (
-        app.name?.toLowerCase().includes(query) ||
-        app.email?.toLowerCase().includes(query) ||
-        app.phone_number?.toLowerCase().includes(query) ||
-        app.application_id?.toString().includes(query) ||
-        app.status?.toLowerCase().includes(query) ||
-        app.relative?.toLowerCase().includes(query)
+        name.includes(query) ||
+        email.includes(query) ||
+        phone.includes(query) ||
+        appId.includes(query) ||
+        status.includes(query) ||
+        relative.includes(query)
       );
     });
   }, [job, applicantSearch]);
