@@ -1,8 +1,8 @@
 "use client";
 
-import { Calendar, Mail, Phone, FileText, ArrowUpRight, Inbox } from 'lucide-react';
+import { Calendar, Mail, Phone, FileText, ArrowUpRight, Inbox, Eye } from 'lucide-react';
 
-export default function ApplicantsList({ applications }) {
+export default function ApplicantsList({ applications, onSelectCandidate }) {
   if (!applications || applications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 text-center gap-3">
@@ -28,11 +28,15 @@ export default function ApplicantsList({ applications }) {
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {applications.map(app => (
-              <tr key={app.application_id} className="hover:bg-zinc-50/50 transition">
+              <tr 
+                key={app.application_id} 
+                className="hover:bg-zinc-50/55 transition cursor-pointer group/row"
+                onClick={() => onSelectCandidate(app)}
+              >
                 {/* Applicant Details */}
                 <td className="p-4 font-semibold text-zinc-950">
                   <div className="flex flex-col gap-0.5">
-                    <span>{app.name}</span>
+                    <span className="group-hover/row:text-indigo-600 transition">{app.name}</span>
                     <span className="text-[10px] font-mono text-zinc-400 font-normal">ID: {app.application_id}</span>
                   </div>
                 </td>
@@ -79,22 +83,31 @@ export default function ApplicantsList({ applications }) {
                   </div>
                 </td>
 
-                {/* CV Action */}
+                {/* Actions */}
                 <td className="p-4 text-right">
-                  {app.cv_url ? (
-                    <a 
-                      href={app.cv_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
+                  <div className="inline-flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                    <button 
+                      onClick={() => onSelectCandidate(app)}
                       className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
                     >
-                      <FileText className="h-3.5 w-3.5 text-zinc-400" />
-                      Resume
-                      <ArrowUpRight className="h-3 w-3 opacity-60" />
-                    </a>
-                  ) : (
-                    <span className="text-[11px] text-zinc-400 italic">No Resume</span>
-                  )}
+                      <Eye className="h-3.5 w-3.5 text-zinc-400" />
+                      View Profile
+                    </button>
+                    {app.cv_url ? (
+                      <a 
+                        href={app.cv_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
+                      >
+                        <FileText className="h-3.5 w-3.5 text-zinc-400" />
+                        Resume
+                        <ArrowUpRight className="h-3 w-3 opacity-60" />
+                      </a>
+                    ) : (
+                      <span className="text-[11px] text-zinc-400 italic px-2">No Resume</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

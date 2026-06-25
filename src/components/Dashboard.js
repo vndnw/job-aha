@@ -20,6 +20,7 @@ import StatsGrid from './StatsGrid';
 import JobCard from './JobCard';
 import JobDetails from './JobDetails';
 import ApplicantsList from './ApplicantsList';
+import CandidateDrawer from './CandidateDrawer';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -34,6 +35,7 @@ export default function Dashboard({ initialJobs }) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [badgeFilter, setBadgeFilter] = useState('all'); // 'all', 'hot', 'new'
   const [activeTab, setActiveTab] = useState('info'); // 'info', 'applicants'
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   // Debounce search input
   useEffect(() => {
@@ -343,7 +345,10 @@ export default function Dashboard({ initialJobs }) {
                         Applications Received: <span className="text-zinc-900 font-extrabold">{displayJob.job_applications?.length || 0}</span>
                       </h3>
                     </div>
-                    <ApplicantsList applications={displayJob.job_applications} />
+                    <ApplicantsList 
+                      applications={displayJob.job_applications} 
+                      onSelectCandidate={setSelectedCandidate}
+                    />
                   </div>
                 )}
 
@@ -359,6 +364,14 @@ export default function Dashboard({ initialJobs }) {
         </main>
 
       </div>
+
+      {/* Candidate Profile Details Slide-over Drawer Overlay */}
+      {selectedCandidate && (
+        <CandidateDrawer 
+          candidate={selectedCandidate} 
+          onClose={() => setSelectedCandidate(null)} 
+        />
+      )}
     </div>
   );
 }
