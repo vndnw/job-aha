@@ -2,6 +2,7 @@ import { getJobsCollection } from '@/lib/db';
 import Sidebar from '@/components/Sidebar';
 import HeaderNav from '@/components/HeaderNav';
 import ResponsiveMain from '@/components/ResponsiveMain';
+import HeaderLogo from '@/components/HeaderLogo';
 
 export const revalidate = 60; // Revalidate page data every minute
 
@@ -26,18 +27,7 @@ export default async function JobsLayout({ children }) {
       {/* Header */}
       <header className="flex h-16 items-center justify-between border-b border-zinc-200/80 bg-white px-6 shrink-0 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-extrabold text-white text-lg tracking-wide shadow-xs animate-pulse-once">
-            A
-          </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-zinc-900 flex items-center gap-1.5">
-              Ahamove Careers
-              <span className="inline-flex items-center rounded-md bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-500 ring-1 ring-inset ring-zinc-200">
-                Dashboard
-              </span>
-            </h1>
-            <p className="text-[10px] text-zinc-400">Recruiter Console & Candidate Tracker</p>
-          </div>
+          <HeaderLogo />
           <HeaderNav />
         </div>
 

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import BlurProvider from "@/components/BlurProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Ahamove Job Dashboard & Applicant Tracker",
-  description: "Dashboard for viewing Ahamove jobs and application statuses crawled from CMS.",
+  title: "A-Careers Job Dashboard & Applicant Tracker",
+  description: "Dashboard for viewing job postings and application statuses crawled from CMS.",
 };
 
 export default function RootLayout({ children }) {
@@ -22,7 +23,11 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <BlurProvider />
+        {children}
+      </body>
     </html>
   );
 }
+

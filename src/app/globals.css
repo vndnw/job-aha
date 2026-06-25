@@ -89,3 +89,13 @@ body {
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Brand protection styling */
+.blurred-brand {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+  display: inline-block;
+  opacity: 0.85;
+}
+
+
