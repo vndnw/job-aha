@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fcfcfc;
+  --background: #fbfbfb;
   --foreground: #09090b;
 }
 
@@ -29,18 +29,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.2);
+  background: rgba(100, 116, 139, 0.15);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(100, 116, 139, 0.3);
 }
 
-/* Rich Text HTML Rendering Reset */
+/* Rich Text HTML Rendering Reset for Light Theme */
 .html-render {
   line-height: 1.7;
-  color: var(--foreground);
+  color: #27272a; /* zinc-800 */
 }
 
 .html-render p {
@@ -65,13 +65,12 @@ body {
 
 .html-render strong {
   font-weight: 600;
-  color: var(--foreground);
+  color: #09090b; /* zinc-950 */
 }
 
 .html-render h1, .html-render h2, .html-render h3 {
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: var(--foreground);
+  color: #09090b;
 }
-
