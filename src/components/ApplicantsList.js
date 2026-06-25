@@ -1,11 +1,15 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Calendar, Mail, Phone, FileText, ArrowUpRight, Inbox, Eye } from 'lucide-react';
 
-export default function ApplicantsList({ applications, onSelectCandidate }) {
+export default function ApplicantsList({ applications, jobId }) {
+  const router = useRouter();
+
   if (!applications || applications.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 text-center gap-3">
+      <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/55 text-center gap-3">
         <Inbox className="h-10 w-10 text-zinc-300" />
         <h4 className="text-sm font-semibold text-zinc-800">No applicants registered</h4>
         <p className="text-xs text-zinc-500 max-w-xs">New applications submitted through CMS will populate here.</p>
@@ -31,12 +35,18 @@ export default function ApplicantsList({ applications, onSelectCandidate }) {
               <tr 
                 key={app.application_id} 
                 className="hover:bg-zinc-50/55 transition cursor-pointer group/row"
-                onClick={() => onSelectCandidate(app)}
+                onClick={() => router.push(`/jobs/${jobId}/candidates/${app.application_id}`)}
               >
                 {/* Applicant Details */}
                 <td className="p-4 font-semibold text-zinc-950">
                   <div className="flex flex-col gap-0.5">
-                    <span className="group-hover/row:text-indigo-600 transition">{app.name}</span>
+                    <Link 
+                      href={`/jobs/${jobId}/candidates/${app.application_id}`}
+                      className="group-hover/row:text-indigo-600 hover:underline transition font-bold"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {app.name}
+                    </Link>
                     <span className="text-[10px] font-mono text-zinc-400 font-normal">ID: {app.application_id}</span>
                   </div>
                 </td>
@@ -86,13 +96,13 @@ export default function ApplicantsList({ applications, onSelectCandidate }) {
                 {/* Actions */}
                 <td className="p-4 text-right">
                   <div className="inline-flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                    <button 
-                      onClick={() => onSelectCandidate(app)}
+                    <Link 
+                      href={`/jobs/${jobId}/candidates/${app.application_id}`}
                       className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
                     >
                       <Eye className="h-3.5 w-3.5 text-zinc-400" />
                       View Profile
-                    </button>
+                    </Link>
                     {app.cv_url ? (
                       <a 
                         href={app.cv_url} 
