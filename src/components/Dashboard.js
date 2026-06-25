@@ -11,7 +11,9 @@ import {
   Flame, 
   Sparkles,
   Mail,
-  Inbox
+  Inbox,
+  Coins,
+  FolderOpen
 } from 'lucide-react';
 import StatsGrid from './StatsGrid';
 import JobCard from './JobCard';
@@ -175,7 +177,7 @@ export default function Dashboard({ initialJobs }) {
                 value={locationFilter}
                 onChange={e => setLocationFilter(e.target.value)}
               >
-                <option value="all">📍 All Locations</option>
+                <option value="all">All Locations</option>
                 {locations.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -186,7 +188,7 @@ export default function Dashboard({ initialJobs }) {
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
               >
-                <option value="all">📂 All Categories</option>
+                <option value="all">All Categories</option>
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
@@ -276,23 +278,27 @@ export default function Dashboard({ initialJobs }) {
                   
                   <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-zinc-500">
                     {displayJob.salary && (
-                      <span className="inline-flex items-center font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">
-                        💰 {displayJob.salary}
+                      <span className="inline-flex items-center gap-1 font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">
+                        <Coins className="h-3.5 w-3.5 text-emerald-600" />
+                        {displayJob.salary}
                       </span>
                     )}
                     {displayJob.job_types?.data?.map(t => (
-                      <span key={t.id} className="inline-flex items-center bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-md text-zinc-600">
-                        📂 {t.attributes?.name}
+                      <span key={t.id} className="inline-flex items-center gap-1 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-md text-zinc-600">
+                        <FolderOpen className="h-3.5 w-3.5 text-zinc-400" />
+                        {t.attributes?.name}
                       </span>
                     ))}
                     {displayJob.locations?.data?.map(l => (
-                      <span key={l.id} className="inline-flex items-center bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-md text-zinc-600">
-                        📍 {l.attributes?.name}
+                      <span key={l.id} className="inline-flex items-center gap-1 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-md text-zinc-600">
+                        <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+                        {l.attributes?.name}
                       </span>
                     ))}
                     {displayJob.expiry_date_of_application && (
-                      <span className="inline-flex items-center border border-rose-100 bg-rose-50 text-rose-600 px-2 py-0.5 rounded-md font-medium">
-                        📅 Expiry: {displayJob.expiry_date_of_application}
+                      <span className="inline-flex items-center gap-1 border border-rose-100 bg-rose-50 text-rose-600 px-2 py-0.5 rounded-md font-medium">
+                        <Calendar className="h-3.5 w-3.5 text-rose-500" />
+                        Expiry: {displayJob.expiry_date_of_application}
                       </span>
                     )}
                   </div>
