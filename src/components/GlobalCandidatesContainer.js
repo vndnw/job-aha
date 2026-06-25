@@ -139,13 +139,13 @@ export default function GlobalCandidatesContainer({
                     <tr 
                       key={`${cand.job_id}-${cand.application_id}`} 
                       className="hover:bg-zinc-50/55 transition cursor-pointer group/row"
-                      onClick={() => router.push(`/jobs/${cand.job_id}/candidates/${cand.application_id}`)}
+                      onClick={() => router.push(`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`)}
                     >
                       {/* Applicant details */}
                       <td className="p-4 font-semibold text-zinc-950">
                         <div className="flex flex-col gap-0.5">
                           <Link 
-                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}`}
+                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
                             className="group-hover/row:text-indigo-600 hover:underline transition font-bold"
                             onClick={e => e.stopPropagation()}
                           >
@@ -215,7 +215,7 @@ export default function GlobalCandidatesContainer({
                       <td className="p-4 text-right">
                         <div className="inline-flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
                           <Link 
-                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}`}
+                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
                             className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
                           >
                             <Eye className="h-3.5 w-3.5 text-zinc-400" />

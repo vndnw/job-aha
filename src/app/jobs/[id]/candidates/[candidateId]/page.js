@@ -18,9 +18,11 @@ import {
 
 export const revalidate = 60; // Revalidate page data every minute
 
-export default async function CandidatePage({ params }) {
+export default async function CandidatePage({ params, searchParams }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const { id, candidateId } = resolvedParams;
+  const from = resolvedSearchParams.from || 'job';
 
   let job = null;
   let candidate = null;
@@ -59,11 +61,11 @@ export default async function CandidatePage({ params }) {
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-zinc-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 shadow-3xs">
         <div className="flex items-center gap-3">
           <Link 
-            href={`/jobs/${id}?tab=applicants`}
+            href={from === 'global' ? '/jobs/candidates' : `/jobs/${id}?tab=applicants`}
             className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 text-xs font-bold text-zinc-600 transition"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Applicants
+            {from === 'global' ? 'Back to Global Candidates' : 'Back to Applicants'}
           </Link>
           <div className="h-4 w-px bg-zinc-200" />
           <div className="flex items-center gap-2">

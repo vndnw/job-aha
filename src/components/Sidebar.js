@@ -68,10 +68,13 @@ export default function Sidebar({ initialJobs }) {
   }, [initialJobs]);
 
   const isRootJobsPage = pathname === '/jobs';
+  const isCandidatesPage = pathname.startsWith('/jobs/candidates');
+  const isCandidateDetailsPage = pathname.includes('/candidates/');
+  const shouldHideSidebar = isCandidatesPage || isCandidateDetailsPage;
 
   return (
     <aside className={`flex-col border-r border-zinc-200/80 bg-white shrink-0 shadow-3xs h-full w-full lg:w-96 ${
-      isRootJobsPage ? 'flex' : 'hidden lg:flex'
+      shouldHideSidebar ? 'hidden' : (isRootJobsPage ? 'flex' : 'hidden lg:flex')
     }`}>
       {/* Filters Pane */}
       <div className="p-4 border-b border-zinc-200/80 flex flex-col gap-3">
