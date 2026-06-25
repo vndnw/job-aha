@@ -1,0 +1,12 @@
+{
+  "name": "aha-job-crawler",
+  "version": "1.0.0",
+  "description": "Ahamove Job Crawler - Crawl jobs and save to MongoDB",
+  "main": "crawl_and_save_to_mongodb.js",
+  "scripts": {
+    "start": "node crawl_and_save_to_mongodb.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.12.0"
+  }
+}
