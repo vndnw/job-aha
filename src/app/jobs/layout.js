@@ -7,11 +7,11 @@ export const revalidate = 60; // Revalidate page data every minute
 
 export default async function JobsLayout({ children }) {
   let serializedJobs = [];
-  
+
   try {
     const collection = await getJobsCollection();
     const rawJobs = await collection.find({}).sort({ publishedAt: -1 }).limit(10).toArray();
-    
+
     serializedJobs = rawJobs.map(job => {
       const serialized = JSON.parse(JSON.stringify(job));
       serialized.id = serialized._id;
@@ -40,11 +40,13 @@ export default async function JobsLayout({ children }) {
           </div>
           <HeaderNav />
         </div>
-        
+
         {/* Info label */}
         <div className="hidden md:flex items-center gap-2 text-xs text-zinc-400">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Synced with Strapi API</span>
+          <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span> 
+          <a href="https://ahanext.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 font-medium transition-colors underline underline-offset-2">
+            Upgrade to Premium
+          </a>
         </div>
       </header>
 
