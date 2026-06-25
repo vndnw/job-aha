@@ -1,12 +1,17 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://vnd:WNobD2Cw3xGnNQ2u@aha.haumld5.mongodb.net/?retryWrites=true&w=majority&appName=aha";
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+}
+
 const options = {};
 
 let client;
 let clientPromise;
 
-if (!process.env.MONGODB_URI) {
+if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
   if (!global._mongoClientPromise) {
