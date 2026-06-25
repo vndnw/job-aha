@@ -1,5 +1,6 @@
 import { getJobsCollection } from '@/lib/db';
 import Sidebar from '@/components/Sidebar';
+import HeaderNav from '@/components/HeaderNav';
 
 export const revalidate = 60; // Revalidate page data every minute
 
@@ -24,7 +25,7 @@ export default async function JobsLayout({ children }) {
       {/* Header */}
       <header className="flex h-16 items-center justify-between border-b border-zinc-200/80 bg-white px-6 shrink-0 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-extrabold text-white text-lg tracking-wide shadow-xs">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-extrabold text-white text-lg tracking-wide shadow-xs animate-pulse-once">
             A
           </div>
           <div>
@@ -36,6 +37,7 @@ export default async function JobsLayout({ children }) {
             </h1>
             <p className="text-[10px] text-zinc-400">Recruiter Console & Candidate Tracker</p>
           </div>
+          <HeaderNav />
         </div>
         
         {/* Info label */}
