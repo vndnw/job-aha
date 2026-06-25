@@ -34,19 +34,29 @@ export default function JobDetailsContainer({
     setApplicantSearch('');
   }, [job.id_job]);
 
+  const normalizeText = (text) => {
+    if (!text) return '';
+    return String(text)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase();
+  };
+
   // Filter applicants for the selected job in real-time
   const filteredApplicants = useMemo(() => {
     if (!job || !job.job_applications) return [];
     if (!applicantSearch) return job.job_applications;
 
-    const query = applicantSearch.toLowerCase();
+    const query = normalizeText(applicantSearch);
     return job.job_applications.filter(app => {
-      const name = app.name ? String(app.name).toLowerCase() : '';
-      const email = app.email ? String(app.email).toLowerCase() : '';
-      const phone = app.phone_number ? String(app.phone_number).toLowerCase() : '';
-      const appId = app.application_id ? String(app.application_id).toLowerCase() : '';
-      const status = app.status ? String(app.status).toLowerCase() : '';
-      const relative = app.relative ? String(app.relative).toLowerCase() : '';
+      const name = normalizeText(app.name);
+      const email = normalizeText(app.email);
+      const phone = normalizeText(app.phone_number);
+      const appId = normalizeText(app.application_id);
+      const status = normalizeText(app.status);
+      const relative = normalizeText(app.relative);
 
       return (
         name.includes(query) ||
@@ -186,6 +196,7 @@ export default function JobDetailsContainer({
             <ApplicantsList 
               applications={filteredApplicants} 
               jobId={job.id_job}
+              isFiltered={!!applicantSearch}
             />
           </div>
         )}

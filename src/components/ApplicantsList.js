@@ -4,15 +4,24 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, Mail, Phone, FileText, ArrowUpRight, Inbox, Eye } from 'lucide-react';
 
-export default function ApplicantsList({ applications, jobId }) {
+export default function ApplicantsList({ applications, jobId, isFiltered }) {
   const router = useRouter();
 
   if (!applications || applications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/55 text-center gap-3">
         <Inbox className="h-10 w-10 text-zinc-300" />
-        <h4 className="text-sm font-semibold text-zinc-800">No applicants registered</h4>
-        <p className="text-xs text-zinc-500 max-w-xs">New applications submitted through CMS will populate here.</p>
+        {isFiltered ? (
+          <>
+            <h4 className="text-sm font-semibold text-zinc-800 font-bold">No candidates match your search</h4>
+            <p className="text-xs text-zinc-500 max-w-xs">Try clearing the filter or searching for another name, email, or ID.</p>
+          </>
+        ) : (
+          <>
+            <h4 className="text-sm font-semibold text-zinc-800 font-bold">No applicants registered</h4>
+            <p className="text-xs text-zinc-500 max-w-xs">New applications submitted through CMS will populate here.</p>
+          </>
+        )}
       </div>
     );
   }
