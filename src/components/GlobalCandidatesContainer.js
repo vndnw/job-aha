@@ -17,6 +17,10 @@ export default function GlobalCandidatesContainer({
   const [searchTerm, setSearchTerm] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   // Debounce search input
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -24,6 +28,11 @@ export default function GlobalCandidatesContainer({
     }, 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
+
+  // Reset pagination to page 1 on new search query
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const normalizeText = (text) => {
     if (!text) return '';
@@ -59,6 +68,30 @@ export default function GlobalCandidatesContainer({
       );
     });
   }, [candidates, searchQuery]);
+
+  const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredCandidates.length);
+
+  const paginatedCandidates = useMemo(() => {
+    return filteredCandidates.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredCandidates, startIndex, itemsPerPage]);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
 
   return (
     <>
@@ -135,7 +168,7 @@ export default function GlobalCandidatesContainer({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {filteredCandidates.map(cand => (
+                  {paginatedCandidates.map(cand => (
                     <tr 
                       key={`${cand.job_id}-${cand.application_id}`} 
                       className="hover:bg-zinc-50/55 transition cursor-pointer group/row"
@@ -241,6 +274,48 @@ export default function GlobalCandidatesContainer({
                   ))}
                 </tbody>
               </table>
+            </div>
+            {/* Pagination Footer */}
+            <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
+              <span className="text-xs text-zinc-500 font-medium">
+                Showing <span className="font-bold text-zinc-900">{filteredCandidates.length === 0 ? 0 : startIndex + 1}</span> to{" "}
+                <span className="font-bold text-zinc-900">{endIndex}</span> of{" "}
+                <span className="font-bold text-zinc-900">{filteredCandidates.length}</span> candidates
+              </span>
+
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
+                  >
+                    Previous
+                  </button>
+
+                  {getPageNumbers().map(pageNum => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold border transition ${
+                        currentPage === pageNum
+                          ? 'bg-indigo-600 border-indigo-700 text-white shadow-3xs'
+                          : 'bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
