@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import useSWR from 'swr';
 import { 
   Search, 
   MapPin, 
@@ -20,13 +21,37 @@ import JobCard from './JobCard';
 import JobDetails from './JobDetails';
 import ApplicantsList from './ApplicantsList';
 
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
 export default function Dashboard({ initialJobs }) {
   const [selectedJobId, setSelectedJobId] = useState(initialJobs[0]?.id_job || null);
+  
+  // Search input and debounced search state
+  const [searchTerm, setSearchTerm] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  
   const [locationFilter, setLocationFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [badgeFilter, setBadgeFilter] = useState('all'); // 'all', 'hot', 'new'
   const [activeTab, setActiveTab] = useState('info'); // 'info', 'applicants'
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(searchTerm);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // SWR Dynamic Data Fetching
+  const { data: filteredJobs = [], error, isValidating } = useSWR(
+    `/api/jobs?search=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(locationFilter)}&category=${encodeURIComponent(categoryFilter)}&badge=${encodeURIComponent(badgeFilter)}`,
+    fetcher,
+    {
+      fallbackData: initialJobs,
+      revalidateOnFocus: false,
+    }
+  );
 
   // Extract unique locations and categories for filters dynamically
   const locations = useMemo(() => {
@@ -57,49 +82,10 @@ export default function Dashboard({ initialJobs }) {
     return Array.from(set);
   }, [initialJobs]);
 
-  // Filter jobs based on search query, locations, categories, and badges
-  const filteredJobs = useMemo(() => {
-    return initialJobs.filter(job => {
-      // 1. Search Query
-      const matchSearch = 
-        !searchQuery ||
-        job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.id_job?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.job_description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.job_requirement?.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // 2. Location
-      let matchLocation = true;
-      if (locationFilter !== 'all') {
-        matchLocation = job.locations?.data?.some(
-          loc => loc.attributes?.name === locationFilter
-        );
-      }
-
-      // 3. Category
-      let matchCategory = true;
-      if (categoryFilter !== 'all') {
-        matchCategory = job.job_types?.data?.some(
-          cat => cat.attributes?.name === categoryFilter
-        );
-      }
-
-      // 4. Badges (Hot / New)
-      let matchBadge = true;
-      if (badgeFilter === 'hot') {
-        matchBadge = job.is_hot === true;
-      } else if (badgeFilter === 'new') {
-        matchBadge = job.is_new === true;
-      }
-
-      return matchSearch && matchLocation && matchCategory && matchBadge;
-    });
-  }, [initialJobs, searchQuery, locationFilter, categoryFilter, badgeFilter]);
-
-  // Selected job details
+  // Selected job details inside filtered results
   const displayJob = useMemo(() => {
-    return initialJobs.find(job => job.id_job === selectedJobId) || filteredJobs[0] || null;
-  }, [initialJobs, selectedJobId, filteredJobs]);
+    return filteredJobs.find(job => job.id_job === selectedJobId) || filteredJobs[0] || null;
+  }, [filteredJobs, selectedJobId]);
 
   // Stats calculation
   const totalJobsCount = initialJobs.length;
@@ -156,13 +142,13 @@ export default function Dashboard({ initialJobs }) {
               <input 
                 type="text" 
                 placeholder="Search jobs, specifications..." 
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full h-9 pl-9 pr-8 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition"
               />
-              {searchQuery && (
+              {searchTerm && (
                 <button 
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => setSearchTerm('')}
                   className="absolute right-2.5 p-0.5 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition"
                 >
                   <X className="h-3 w-3" />
