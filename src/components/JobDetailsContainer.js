@@ -18,6 +18,7 @@ export default function JobDetailsContainer({
   const tabParam = searchParams.get('tab');
   
   const [activeTab, setActiveTab] = useState(tabParam === 'applicants' ? 'applicants' : 'info');
+  const [searchTerm, setSearchTerm] = useState('');
   const [applicantSearch, setApplicantSearch] = useState('');
 
   // Sync activeTab when query param changes
@@ -29,8 +30,17 @@ export default function JobDetailsContainer({
     }
   }, [tabParam]);
 
+  // Debounce candidate search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setApplicantSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   // Reset applicant search filter when job changes
   useEffect(() => {
+    setSearchTerm('');
     setApplicantSearch('');
   }, [job.id_job]);
 
@@ -178,13 +188,13 @@ export default function JobDetailsContainer({
                 <input 
                   type="text" 
                   placeholder="Search candidate name, email, phone..." 
-                  value={applicantSearch}
-                  onChange={e => setApplicantSearch(e.target.value)}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="w-full h-8 pl-8 pr-7 rounded-md bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:bg-white transition"
                 />
-                {applicantSearch && (
+                {searchTerm && (
                   <button 
-                    onClick={() => setApplicantSearch('')}
+                    onClick={() => setSearchTerm('')}
                     className="absolute right-2 p-0.5 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition"
                   >
                     <X className="h-3 w-3" />
