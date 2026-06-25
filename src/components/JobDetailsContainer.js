@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useTransition } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Calendar, Coins, FolderOpen, MapPin, Search, X, ArrowLeft } from 'lucide-react';
 import StatsGrid from './StatsGrid';
@@ -13,14 +13,22 @@ export default function JobDetailsContainer({
   totalJobsCount, 
   hotJobsCount, 
   newJobsCount, 
-  totalApplicantsCount 
+  totalApplicantsCount,
+  jobApplicantsCount,
+  paginatedApplicants,
+  currentPage,
+  totalPages,
+  filteredTotal,
+  initialSearch,
+  limit
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const tabParam = searchParams.get('tab');
   
   const [activeTab, setActiveTab] = useState(tabParam === 'applicants' ? 'applicants' : 'info');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [applicantSearch, setApplicantSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch || '');
+  const [isPending, startTransition] = useTransition();
 
   // Sync activeTab when query param changes
   useEffect(() => {
@@ -34,51 +42,46 @@ export default function JobDetailsContainer({
   // Debounce candidate search input
   useEffect(() => {
     const handler = setTimeout(() => {
-      setApplicantSearch(searchTerm);
+      if (searchTerm !== (initialSearch || '')) {
+        startTransition(() => {
+          router.push(`/jobs/${job.id_job}?tab=applicants&page=1&search=${encodeURIComponent(searchTerm)}&limit=${limit}`);
+        });
+      }
     }, 300);
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, router, job.id_job, initialSearch, limit]);
 
   // Reset applicant search filter when job changes
   useEffect(() => {
     setSearchTerm('');
-    setApplicantSearch('');
   }, [job.id_job]);
 
-  const normalizeText = (text) => {
-    if (!text) return '';
-    return String(text)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "D")
-      .toLowerCase();
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    startTransition(() => {
+      router.push(`/jobs/${job.id_job}?tab=${tabName}&page=1&search=${encodeURIComponent(searchTerm)}&limit=${limit}`);
+    });
   };
 
-  // Filter applicants for the selected job in real-time
-  const filteredApplicants = useMemo(() => {
-    if (!job || !job.job_applications) return [];
-    if (!applicantSearch) return job.job_applications;
-
-    const query = normalizeText(applicantSearch);
-    return job.job_applications.filter(app => {
-      const name = normalizeText(app.name);
-      const email = normalizeText(app.email);
-      const phone = normalizeText(app.phone_number);
-      const appId = normalizeText(app.application_id);
-      const status = normalizeText(app.status);
-      const relative = normalizeText(app.relative);
-
-      return (
-        name.includes(query) ||
-        email.includes(query) ||
-        phone.includes(query) ||
-        appId.includes(query) ||
-        status.includes(query) ||
-        relative.includes(query)
-      );
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    startTransition(() => {
+      router.push(`/jobs/${job.id_job}?tab=applicants&page=1&search=&limit=${limit}`);
     });
-  }, [job, applicantSearch]);
+  };
+
+  const handlePageChange = (pageNum) => {
+    if (pageNum === currentPage) return;
+    startTransition(() => {
+      router.push(`/jobs/${job.id_job}?tab=applicants&page=${pageNum}&search=${encodeURIComponent(searchTerm)}&limit=${limit}`);
+    });
+  };
+
+  const handleLimitChange = (newLimit) => {
+    startTransition(() => {
+      router.push(`/jobs/${job.id_job}?tab=applicants&page=1&search=${encodeURIComponent(searchTerm)}&limit=${newLimit}`);
+    });
+  };
 
   return (
     <>
@@ -162,7 +165,7 @@ export default function JobDetailsContainer({
               ? 'text-indigo-600 border-indigo-600' 
               : 'text-zinc-400 border-transparent hover:text-zinc-600'
           }`}
-          onClick={() => setActiveTab('info')}
+          onClick={() => handleTabChange('info')}
         >
           Job Specifications
         </button>
@@ -172,9 +175,9 @@ export default function JobDetailsContainer({
               ? 'text-indigo-600 border-indigo-600' 
               : 'text-zinc-400 border-transparent hover:text-zinc-600'
           }`}
-          onClick={() => setActiveTab('applicants')}
+          onClick={() => handleTabChange('applicants')}
         >
-          Applicants ({job.job_applications?.length || 0})
+          Applicants ({jobApplicantsCount})
         </button>
       </div>
 
@@ -191,7 +194,7 @@ export default function JobDetailsContainer({
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-zinc-200/80 rounded-xl p-4 shadow-3xs">
               <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Applications: <span className="text-zinc-900 font-extrabold">{filteredApplicants.length}</span> / {job.job_applications?.length || 0} total
+                Applications: <span className="text-zinc-900 font-extrabold">{filteredTotal}</span> / {jobApplicantsCount} total
               </h3>
               
               {/* Search box for applicants */}
@@ -206,7 +209,7 @@ export default function JobDetailsContainer({
                 />
                 {searchTerm && (
                   <button 
-                    onClick={() => setSearchTerm('')}
+                    onClick={handleClearSearch}
                     className="absolute right-2 p-0.5 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition"
                   >
                     <X className="h-3 w-3" />
@@ -216,9 +219,16 @@ export default function JobDetailsContainer({
             </div>
             
             <ApplicantsList 
-              applications={filteredApplicants} 
+              applications={paginatedApplicants} 
               jobId={job.id_job}
-              isFiltered={!!applicantSearch}
+              isFiltered={!!searchTerm}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              filteredTotal={filteredTotal}
+              isPending={isPending}
+              onPageChange={handlePageChange}
+              limit={limit}
+              onLimitChange={handleLimitChange}
             />
           </div>
         )}

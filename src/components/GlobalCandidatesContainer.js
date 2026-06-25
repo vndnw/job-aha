@@ -1,81 +1,77 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, Calendar, Mail, Phone, FileText, ArrowUpRight, Inbox, Eye, Briefcase } from 'lucide-react';
 import StatsGrid from './StatsGrid';
+import Skeleton from './Skeleton';
 
 export default function GlobalCandidatesContainer({ 
   candidates,
   totalJobsCount,
   hotJobsCount,
   newJobsCount,
-  totalApplicantsCount
+  totalApplicantsCount,
+  filteredTotal,
+  currentPage,
+  totalPages,
+  initialSearch,
+  limit
 }) {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch || '');
+  const [jumpPage, setJumpPage] = useState('');
+  const [isPending, startTransition] = useTransition();
 
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = limit;
 
-  // Debounce search input
+  // Debounce search input and update URL parameters
   useEffect(() => {
     const handler = setTimeout(() => {
-      setSearchQuery(searchTerm);
+      if (searchTerm !== (initialSearch || '')) {
+        startTransition(() => {
+          router.push(`/jobs/candidates?search=${encodeURIComponent(searchTerm)}&page=1&limit=${limit}`);
+        });
+      }
     }, 300);
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, router, initialSearch, limit]);
 
-  // Reset pagination to page 1 on new search query
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  const normalizeText = (text) => {
-    if (!text) return '';
-    return String(text)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "D")
-      .toLowerCase();
+  const handlePageChange = (pageNum) => {
+    if (pageNum === currentPage) return;
+    startTransition(() => {
+      router.push(`/jobs/candidates?search=${encodeURIComponent(searchTerm)}&page=${pageNum}&limit=${limit}`);
+    });
   };
 
-  const filteredCandidates = useMemo(() => {
-    if (!searchQuery) return candidates;
-
-    const query = normalizeText(searchQuery);
-    return candidates.filter(cand => {
-      const name = normalizeText(cand.name);
-      const email = normalizeText(cand.email);
-      const phone = normalizeText(cand.phone_number);
-      const appId = normalizeText(cand.application_id);
-      const status = normalizeText(cand.status);
-      const relative = normalizeText(cand.relative);
-      const jobTitle = normalizeText(cand.job_title);
-
-      return (
-        name.includes(query) ||
-        email.includes(query) ||
-        phone.includes(query) ||
-        appId.includes(query) ||
-        status.includes(query) ||
-        relative.includes(query) ||
-        jobTitle.includes(query)
-      );
+  const handleLimitChange = (newLimit) => {
+    startTransition(() => {
+      router.push(`/jobs/candidates?search=${encodeURIComponent(searchTerm)}&page=1&limit=${newLimit}`);
     });
-  }, [candidates, searchQuery]);
+  };
 
-  const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredCandidates.length);
+  const handleJumpPage = (e) => {
+    e.preventDefault();
+    const pageNum = parseInt(jumpPage);
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+      handlePageChange(pageNum);
+      setJumpPage('');
+    } else if (pageNum > totalPages) {
+      handlePageChange(totalPages);
+      setJumpPage('');
+    } else if (pageNum < 1) {
+      handlePageChange(1);
+      setJumpPage('');
+    }
+  };
 
-  const paginatedCandidates = useMemo(() => {
-    return filteredCandidates.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredCandidates, startIndex, itemsPerPage]);
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    startTransition(() => {
+      router.push(`/jobs/candidates?search=&page=1&limit=${limit}`);
+    });
+  };
 
   const getPageNumbers = () => {
     const pages = [];
@@ -92,6 +88,48 @@ export default function GlobalCandidatesContainer({
     }
     return pages;
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + candidates.length, filteredTotal);
+
+  // Skeleton rows for rendering during pending transitions
+  const SkeletonRow = () => (
+    <tr className="animate-pulse bg-white/40">
+      <td className="p-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-28 bg-zinc-200" />
+          <Skeleton className="h-3 w-16 bg-zinc-100" />
+        </div>
+      </td>
+      <td className="p-4">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-3.5 rounded bg-zinc-200" />
+          <Skeleton className="h-4 w-32 bg-zinc-200" />
+        </div>
+      </td>
+      <td className="p-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-3.5 w-24 bg-zinc-200" />
+          <Skeleton className="h-3 w-32 bg-zinc-100" />
+        </div>
+      </td>
+      <td className="p-4">
+        <Skeleton className="h-4 w-20 bg-zinc-200" />
+      </td>
+      <td className="p-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-5 w-16 bg-zinc-200 rounded-md" />
+          <Skeleton className="h-3 w-12 bg-zinc-100" />
+        </div>
+      </td>
+      <td className="p-4 text-right">
+        <div className="inline-flex gap-2 justify-end w-full">
+          <Skeleton className="h-8 w-24 bg-zinc-200 rounded-lg" />
+          <Skeleton className="h-8 w-20 bg-zinc-200 rounded-lg" />
+        </div>
+      </td>
+    </tr>
+  );
 
   return (
     <>
@@ -119,7 +157,7 @@ export default function GlobalCandidatesContainer({
         {/* Search controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-zinc-200/80 rounded-xl p-4 shadow-3xs">
           <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-            Total Candidates: <span className="text-zinc-900 font-extrabold">{filteredCandidates.length}</span> / {candidates.length} global
+            Total Candidates: <span className="text-zinc-900 font-extrabold">{filteredTotal}</span> / {totalApplicantsCount} global
           </h3>
           
           <div className="relative flex items-center w-full sm:w-80">
@@ -133,7 +171,7 @@ export default function GlobalCandidatesContainer({
             />
             {searchTerm && (
               <button 
-                onClick={() => setSearchTerm('')}
+                onClick={handleClearSearch}
                 className="absolute right-2 p-0.5 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition"
               >
                 <X className="h-3 w-3" />
@@ -143,7 +181,7 @@ export default function GlobalCandidatesContainer({
         </div>
 
         {/* Master Table */}
-        {filteredCandidates.length === 0 ? (
+        {!isPending && candidates.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-16 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/55 text-center gap-3">
             <Inbox className="h-10 w-10 text-zinc-300" />
             <h4 className="text-sm font-semibold text-zinc-800 font-bold">
@@ -154,7 +192,13 @@ export default function GlobalCandidatesContainer({
             </p>
           </div>
         ) : (
-          <div className="border border-zinc-200/80 rounded-xl bg-white overflow-hidden shadow-xs">
+          <div className="border border-zinc-200/80 rounded-xl bg-white overflow-hidden shadow-xs relative">
+            
+            {/* Loading Overlay */}
+            {isPending && (
+              <div className="absolute inset-0 bg-white/20 backdrop-blur-xs flex items-center justify-center z-10" />
+            )}
+
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs">
                 <thead>
@@ -168,154 +212,198 @@ export default function GlobalCandidatesContainer({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {paginatedCandidates.map(cand => (
-                    <tr 
-                      key={`${cand.job_id}-${cand.application_id}`} 
-                      className="hover:bg-zinc-50/55 transition cursor-pointer group/row"
-                      onClick={() => router.push(`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`)}
-                    >
-                      {/* Applicant details */}
-                      <td className="p-4 font-semibold text-zinc-950">
-                        <div className="flex flex-col gap-0.5">
-                          <Link 
-                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
-                            className="group-hover/row:text-indigo-600 hover:underline transition font-bold"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            {cand.name}
-                          </Link>
-                          <span className="text-[10px] font-mono text-zinc-400 font-normal">ID: {cand.application_id}</span>
-                        </div>
-                      </td>
+                  {isPending ? (
+                    <>
+                      <SkeletonRow />
+                      <SkeletonRow />
+                      <SkeletonRow />
+                      <SkeletonRow />
+                      <SkeletonRow />
+                    </>
+                  ) : (
+                    candidates.map(cand => (
+                      <tr 
+                        key={`${cand.job_id}-${cand.application_id}`} 
+                        className="hover:bg-zinc-50/55 transition cursor-pointer group/row animate-fade-in"
+                        onClick={() => router.push(`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`)}
+                      >
+                        {/* Applicant details */}
+                        <td className="p-4 font-semibold text-zinc-950">
+                          <div className="flex flex-col gap-0.5">
+                            <Link 
+                              href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
+                              className="group-hover/row:text-indigo-600 hover:underline transition font-bold"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              {cand.name}
+                            </Link>
+                            <span className="text-[10px] font-mono text-zinc-400 font-normal">ID: {cand.application_id}</span>
+                          </div>
+                        </td>
 
-                      {/* Target Position */}
-                      <td className="p-4 font-semibold text-zinc-900">
-                        <div className="flex items-center gap-1.5 min-w-0 max-w-[200px] text-zinc-800">
-                          <Briefcase className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
-                          <Link 
-                            href={`/jobs/${cand.job_id}`}
-                            className="hover:text-indigo-600 truncate transition"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            {cand.job_title}
-                          </Link>
-                        </div>
-                      </td>
-                      
-                      {/* Contact Info */}
-                      <td className="p-4">
-                        <div className="flex flex-col gap-1 text-zinc-700 text-[11px]">
-                          <span className="flex items-center gap-1.5 font-medium">
-                            <Phone className="h-3.5 w-3.5 text-zinc-400" /> {cand.phone_number || 'N/A'}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-zinc-500">
-                            <Mail className="h-3.5 w-3.5 text-zinc-400" /> {cand.email}
-                          </span>
-                        </div>
-                      </td>
+                        {/* Target Position */}
+                        <td className="p-4 font-semibold text-zinc-900">
+                          <div className="flex items-center gap-1.5 min-w-0 max-w-[200px] text-zinc-800">
+                            <Briefcase className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                            <Link 
+                              href={`/jobs/${cand.job_id}`}
+                              className="hover:text-indigo-600 truncate transition"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              {cand.job_title}
+                            </Link>
+                          </div>
+                        </td>
+                        
+                        {/* Contact Info */}
+                        <td className="p-4">
+                          <div className="flex flex-col gap-1 text-zinc-700 text-[11px]">
+                            <span className="flex items-center gap-1.5 font-medium">
+                              <Phone className="h-3.5 w-3.5 text-zinc-400" /> {cand.phone_number || 'N/A'}
+                            </span>
+                            <span className="flex items-center gap-1.5 text-zinc-500">
+                              <Mail className="h-3.5 w-3.5 text-zinc-400" /> {cand.email}
+                            </span>
+                          </div>
+                        </td>
 
-                      {/* Date */}
-                      <td className="p-4 text-zinc-600">
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                          <Calendar className="h-3.5 w-3.5 text-zinc-400" />
-                          <span>
-                            {cand.applied_date ? new Date(cand.applied_date).toLocaleDateString('en-GB') : 'N/A'}
-                          </span>
-                        </div>
-                      </td>
+                        {/* Date */}
+                        <td className="p-4 text-zinc-600">
+                          <div className="flex items-center gap-1.5 text-[11px]">
+                            <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                            <span>
+                              {cand.applied_date ? new Date(cand.applied_date).toLocaleDateString('en-GB') : 'N/A'}
+                            </span>
+                          </div>
+                        </td>
 
-                      {/* Status & Source */}
-                      <td className="p-4">
-                        <div className="flex flex-col gap-1 items-start">
-                          <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold border ${
-                            cand.status === 'Lọc CV' 
-                              ? 'bg-zinc-100 text-zinc-700 border-zinc-200' 
-                              : cand.status === 'Đạt' 
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : cand.status === 'Không đạt'
-                                  ? 'bg-rose-50 text-rose-700 border-rose-200'
-                                  : 'bg-amber-50 text-amber-700 border-amber-200'
-                          }`}>
-                            {cand.status || 'N/A'}
-                          </span>
-                          <span className="text-[10px] text-zinc-400 font-medium">
-                            via {cand.relative || 'Direct'}
-                          </span>
-                        </div>
-                      </td>
+                        {/* Status & Source */}
+                        <td className="p-4">
+                          <div className="flex flex-col gap-1 items-start">
+                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold border ${
+                              cand.status === 'Lọc CV' 
+                                ? 'bg-zinc-100 text-zinc-700 border-zinc-200' 
+                                : cand.status === 'Đạt' 
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : cand.status === 'Không đạt'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                            }`}>
+                              {cand.status || 'N/A'}
+                            </span>
+                            <span className="text-[10px] text-zinc-400 font-medium">
+                              via {cand.relative || 'Direct'}
+                            </span>
+                          </div>
+                        </td>
 
-                      {/* Actions */}
-                      <td className="p-4 text-right">
-                        <div className="inline-flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                          <Link 
-                            href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
-                            className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
-                          >
-                            <Eye className="h-3.5 w-3.5 text-zinc-400" />
-                            View Profile
-                          </Link>
-                          {cand.cv_url ? (
-                            <a 
-                              href={cand.cv_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
+                        {/* Actions */}
+                        <td className="p-4 text-right">
+                          <div className="inline-flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                            <Link 
+                              href={`/jobs/${cand.job_id}/candidates/${cand.application_id}?from=global`}
                               className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
                             >
-                              <FileText className="h-3.5 w-3.5 text-zinc-400" />
-                              Resume
-                              <ArrowUpRight className="h-3 w-3 opacity-60" />
-                            </a>
-                          ) : (
-                            <span className="text-[11px] text-zinc-400 italic px-2">No Resume</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                              <Eye className="h-3.5 w-3.5 text-zinc-400" />
+                              View Profile
+                            </Link>
+                            {cand.cv_url ? (
+                              <a 
+                                href={cand.cv_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
+                              >
+                                <FileText className="h-3.5 w-3.5 text-zinc-400" />
+                                Resume
+                                <ArrowUpRight className="h-3 w-3 opacity-60" />
+                              </a>
+                            ) : (
+                              <span className="text-[11px] text-zinc-400 italic px-2">No Resume</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+
             {/* Pagination Footer */}
             <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
-              <span className="text-xs text-zinc-500 font-medium">
-                Showing <span className="font-bold text-zinc-900">{filteredCandidates.length === 0 ? 0 : startIndex + 1}</span> to{" "}
-                <span className="font-bold text-zinc-900">{endIndex}</span> of{" "}
-                <span className="font-bold text-zinc-900">{filteredCandidates.length}</span> candidates
-              </span>
-
-              {totalPages > 1 && (
-                <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="text-xs text-zinc-500 font-medium">
+                  Showing <span className="font-bold text-zinc-900">{filteredTotal === 0 ? 0 : startIndex + 1}</span> to{" "}
+                  <span className="font-bold text-zinc-900">{endIndex}</span> of{" "}
+                  <span className="font-bold text-zinc-900">{filteredTotal}</span> candidates
+                </span>
+                
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-zinc-400 font-medium">Show:</span>
+                  <select
+                    value={limit}
+                    onChange={(e) => handleLimitChange(parseInt(e.target.value))}
+                    disabled={isPending}
+                    className="h-7 rounded border border-zinc-200 bg-white text-[11px] font-bold text-zinc-700 px-1.5 outline-none cursor-pointer focus:border-zinc-400"
                   >
-                    Previous
-                  </button>
-
-                  {getPageNumbers().map(pageNum => (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold border transition ${
-                        currentPage === pageNum
-                          ? 'bg-indigo-600 border-indigo-700 text-white shadow-3xs'
-                          : 'bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition"
-                  >
-                    Next
-                  </button>
+                    {[10, 20, 50, 100].map(size => (
+                      <option key={size} value={size}>{size} rows</option>
+                    ))}
+                  </select>
                 </div>
-              )}
+              </div>
+
+              <div className="flex items-center flex-wrap gap-3 self-end sm:self-auto">
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                      disabled={currentPage === 1 || isPending}
+                      className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition cursor-pointer"
+                    >
+                      Previous
+                    </button>
+
+                    {getPageNumbers().map(pageNum => (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        disabled={isPending}
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold border transition cursor-pointer ${
+                          currentPage === pageNum
+                            ? 'bg-indigo-600 border-indigo-700 text-white shadow-3xs'
+                            : 'bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                      disabled={currentPage === totalPages || isPending}
+                      className="inline-flex h-8 items-center gap-1 px-3 rounded-lg border border-zinc-200 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition cursor-pointer"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+
+                {totalPages > 1 && (
+                  <form onSubmit={handleJumpPage} className="flex items-center gap-1.5 border-l border-zinc-200 pl-3">
+                    <span className="text-xs text-zinc-400 font-medium">Go to:</span>
+                    <input
+                      type="text"
+                      value={jumpPage}
+                      onChange={(e) => setJumpPage(e.target.value.replace(/\D/g, ''))}
+                      disabled={isPending}
+                      placeholder={currentPage}
+                      className="w-9 h-7 rounded border border-zinc-200 bg-white text-center text-xs font-bold text-zinc-700 outline-none focus:border-zinc-400 placeholder-zinc-300"
+                    />
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         )}

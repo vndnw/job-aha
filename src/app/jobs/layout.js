@@ -10,7 +10,7 @@ export default async function JobsLayout({ children }) {
   
   try {
     const collection = await getJobsCollection();
-    const rawJobs = await collection.find({}).sort({ publishedAt: -1 }).toArray();
+    const rawJobs = await collection.find({}).sort({ publishedAt: -1 }).limit(10).toArray();
     
     serializedJobs = rawJobs.map(job => {
       const serialized = JSON.parse(JSON.stringify(job));

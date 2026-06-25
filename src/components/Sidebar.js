@@ -1,11 +1,28 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, X, Flame, Sparkles, Inbox } from 'lucide-react';
 import JobCard from './JobCard';
+import Skeleton from './Skeleton';
+
+const SidebarJobCardSkeleton = () => (
+  <div className="flex flex-col gap-2 rounded-xl p-4 border border-zinc-200/80 bg-white/70 animate-pulse">
+    <div className="flex items-start justify-between gap-3">
+      <Skeleton className="h-4 w-44 bg-zinc-200" />
+      <Skeleton className="h-4 w-10 bg-zinc-200 rounded" />
+    </div>
+    <div className="flex items-center justify-between mt-1">
+      <div className="flex items-center gap-1">
+        <Skeleton className="h-3.5 w-3.5 rounded bg-zinc-200" />
+        <Skeleton className="h-3 w-20 bg-zinc-200" />
+      </div>
+      <Skeleton className="h-4 w-12 rounded-full bg-zinc-200" />
+    </div>
+  </div>
+);
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -19,6 +36,10 @@ export default function Sidebar({ initialJobs }) {
   const [locationFilter, setLocationFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [badgeFilter, setBadgeFilter] = useState('all'); // 'all', 'hot', 'new'
+  
+  // Pagination / Limit State
+  const [limit, setLimit] = useState(10);
+  const loadMoreRef = useRef(null);
 
   // Debounce search input
   useEffect(() => {
@@ -28,15 +49,45 @@ export default function Sidebar({ initialJobs }) {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // SWR Dynamic Data Fetching for job sidebar list
-  const { data: filteredJobs = [] } = useSWR(
-    `/api/jobs?search=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(locationFilter)}&category=${encodeURIComponent(categoryFilter)}&badge=${encodeURIComponent(badgeFilter)}`,
+  // Reset limit when query or filters change
+  useEffect(() => {
+    setLimit(10);
+  }, [searchQuery, locationFilter, categoryFilter, badgeFilter]);
+
+  // SWR Dynamic Data Fetching for job sidebar list with limit
+  const { data: filteredJobs = [], isValidating } = useSWR(
+    `/api/jobs?search=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(locationFilter)}&category=${encodeURIComponent(categoryFilter)}&badge=${encodeURIComponent(badgeFilter)}&limit=${limit}`,
     fetcher,
     {
-      fallbackData: initialJobs,
+      fallbackData: initialJobs.slice(0, limit),
       revalidateOnFocus: false,
     }
   );
+
+  // Set up IntersectionObserver for Infinite Scroll
+  useEffect(() => {
+    const currentSensor = loadMoreRef.current;
+    if (!currentSensor) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      const first = entries[0];
+      if (first.isIntersecting && filteredJobs.length === limit) {
+        setLimit(prev => prev + 10);
+      }
+    }, {
+      root: null,
+      threshold: 0.1
+    });
+
+    observer.observe(currentSensor);
+
+    return () => {
+      if (currentSensor) {
+        observer.unobserve(currentSensor);
+      }
+    };
+  }, [filteredJobs.length, limit]);
+
 
   // Extract unique locations and categories dynamically from initial database dump
   const locations = useMemo(() => {
@@ -80,7 +131,13 @@ export default function Sidebar({ initialJobs }) {
       <div className="p-4 border-b border-zinc-200/80 flex flex-col gap-3">
         {/* Search Box */}
         <div className="relative flex items-center">
-          <Search className="absolute left-3 h-4 w-4 text-zinc-400 pointer-events-none" />
+          {isValidating ? (
+            <div className="absolute left-3 pointer-events-none flex items-center justify-center">
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border border-indigo-650 border-t-transparent" />
+            </div>
+          ) : (
+            <Search className="absolute left-3 h-4 w-4 text-zinc-400 pointer-events-none" />
+          )}
           <input 
             type="text" 
             placeholder="Search jobs, specifications..." 
@@ -159,26 +216,48 @@ export default function Sidebar({ initialJobs }) {
         </div>
       </div>
 
-      {/* Job List Scroll */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#fafafa]">
-        {filteredJobs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center gap-2">
-            <Inbox className="h-8 w-8 text-zinc-300" />
-            <p className="text-xs font-semibold text-zinc-400">No jobs found</p>
-            <p className="text-[10px] text-zinc-500">Try adjusting your filters</p>
+      {/* Job List Wrapper Container */}
+      <div className="flex-1 relative overflow-hidden flex flex-col min-h-0">
+        {/* Job List Scroll */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#fafafa]">
+          {isValidating && filteredJobs.length === 0 ? (
+            <>
+              <SidebarJobCardSkeleton />
+              <SidebarJobCardSkeleton />
+              <SidebarJobCardSkeleton />
+            </>
+          ) : filteredJobs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center gap-2">
+              <Inbox className="h-8 w-8 text-zinc-300" />
+              <p className="text-xs font-semibold text-zinc-400">No jobs found</p>
+              <p className="text-[10px] text-zinc-500">Try adjusting your filters</p>
+            </div>
+          ) : (
+            <>
+              {filteredJobs.map(job => {
+                const isActive = pathname.startsWith(`/jobs/${job.id_job}`);
+                return (
+                  <Link href={`/jobs/${job.id_job}`} key={job.id_job} className="block">
+                    <JobCard 
+                      job={job}
+                      isActive={isActive}
+                    />
+                  </Link>
+                );
+              })}
+              
+              {filteredJobs.length > 0 && filteredJobs.length === limit && (
+                <div ref={loadMoreRef} className="h-4 w-full" />
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Large Loading Overlay when validating - covers only the list viewport */}
+        {isValidating && (
+          <div className="absolute inset-0 bg-[#fafafa]/70 backdrop-blur-[1.5px] flex items-center justify-center z-35 transition-all duration-200">
+            <div className="h-8 w-8 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent" />
           </div>
-        ) : (
-          filteredJobs.map(job => {
-            const isActive = pathname.startsWith(`/jobs/${job.id_job}`);
-            return (
-              <Link href={`/jobs/${job.id_job}`} key={job.id_job} className="block">
-                <JobCard 
-                  job={job}
-                  isActive={isActive}
-                />
-              </Link>
-            );
-          })
         )}
       </div>
     </aside>

@@ -38,7 +38,9 @@ export async function GET(request) {
       query.is_new = true;
     }
 
-    const rawJobs = await collection.find(query).sort({ publishedAt: -1 }).toArray();
+    const limit = parseInt(searchParams.get('limit')) || 10;
+
+    const rawJobs = await collection.find(query).sort({ publishedAt: -1 }).limit(limit).toArray();
 
     // Serialize MongoDB ObjectIds
     const jobs = rawJobs.map(job => {
