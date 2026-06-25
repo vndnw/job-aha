@@ -63,7 +63,7 @@ export default function GlobalCandidatesContainer({
   return (
     <>
       {/* Stats Grid at the top */}
-      <div className="p-6 pb-2 shrink-0">
+      <div className="p-4 sm:p-6 pb-2 shrink-0">
         <StatsGrid 
           totalJobs={totalJobsCount}
           hotJobs={hotJobsCount}
@@ -73,7 +73,7 @@ export default function GlobalCandidatesContainer({
       </div>
 
       {/* Global Candidates Header */}
-      <div className="px-6 py-4 bg-white border-y border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 shadow-3xs">
+      <div className="px-4 sm:px-6 py-4 bg-white border-y border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 shadow-3xs">
         <div className="space-y-1">
           <h2 className="text-base font-bold tracking-tight text-zinc-900">Global Candidate Search</h2>
           <p className="text-xs text-zinc-400">Search and filter candidates across all active hiring campaigns</p>
@@ -81,7 +81,7 @@ export default function GlobalCandidatesContainer({
       </div>
 
       {/* Main Panel Scroll */}
-      <div className="flex-1 overflow-y-auto p-6 min-h-0 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0 space-y-4">
         
         {/* Search controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-zinc-200/80 rounded-xl p-4 shadow-3xs">

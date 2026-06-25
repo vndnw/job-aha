@@ -1,6 +1,7 @@
 import { getJobsCollection } from '@/lib/db';
 import Sidebar from '@/components/Sidebar';
 import HeaderNav from '@/components/HeaderNav';
+import ResponsiveMain from '@/components/ResponsiveMain';
 
 export const revalidate = 60; // Revalidate page data every minute
 
@@ -50,9 +51,9 @@ export default async function JobsLayout({ children }) {
       {/* Main Container Split View */}
       <div className="flex flex-1 overflow-hidden min-h-0">
         <Sidebar initialJobs={serializedJobs} />
-        <main className="flex-1 flex flex-col bg-[#fafafa] overflow-hidden">
+        <ResponsiveMain>
           {children}
-        </main>
+        </ResponsiveMain>
       </div>
     </div>
   );

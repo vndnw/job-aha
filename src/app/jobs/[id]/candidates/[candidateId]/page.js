@@ -56,7 +56,7 @@ export default async function CandidatePage({ params }) {
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-[#fafafa] overflow-y-auto">
       {/* Top Navigation / Breadcrumb Header */}
-      <div className="px-6 py-4 bg-white border-b border-zinc-200/80 flex items-center justify-between shrink-0 shadow-3xs">
+      <div className="px-4 sm:px-6 py-4 bg-white border-b border-zinc-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 shadow-3xs">
         <div className="flex items-center gap-3">
           <Link 
             href={`/jobs/${id}?tab=applicants`}
@@ -94,8 +94,8 @@ export default async function CandidatePage({ params }) {
       </div>
 
       {/* Profile Overview Header Card */}
-      <div className="p-6 pb-2 shrink-0">
-        <div className="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-3xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 pb-2 shrink-0">
+        <div className="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-6 shadow-3xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center rounded-md bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-500 font-mono">
@@ -138,7 +138,7 @@ export default async function CandidatePage({ params }) {
       </div>
 
       {/* Main Grid Columns Content Area */}
-      <div className="p-6 pt-2 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-4 sm:p-6 pt-2 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column (Span 2) - Assessments, Info, Notes */}
         <div className="lg:col-span-2 space-y-6">

@@ -67,8 +67,12 @@ export default function Sidebar({ initialJobs }) {
     return Array.from(set);
   }, [initialJobs]);
 
+  const isRootJobsPage = pathname === '/jobs';
+
   return (
-    <aside className="w-80 md:w-96 flex flex-col border-r border-zinc-200/80 bg-white shrink-0 shadow-3xs h-full">
+    <aside className={`flex-col border-r border-zinc-200/80 bg-white shrink-0 shadow-3xs h-full w-full lg:w-96 ${
+      isRootJobsPage ? 'flex' : 'hidden lg:flex'
+    }`}>
       {/* Filters Pane */}
       <div className="p-4 border-b border-zinc-200/80 flex flex-col gap-3">
         {/* Search Box */}

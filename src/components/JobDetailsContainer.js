@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Mail, Calendar, Coins, FolderOpen, MapPin, Search, X } from 'lucide-react';
+import Link from 'next/link';
+import { Mail, Calendar, Coins, FolderOpen, MapPin, Search, X, ArrowLeft } from 'lucide-react';
 import StatsGrid from './StatsGrid';
 import JobDetails from './JobDetails';
 import ApplicantsList from './ApplicantsList';
@@ -82,7 +83,18 @@ export default function JobDetailsContainer({
   return (
     <>
       {/* Stats Grid at the top */}
-      <div className="p-6 pb-2 shrink-0">
+      <div className="p-4 sm:p-6 pb-2 shrink-0">
+        {/* Back to Jobs button for Mobile/Tablet */}
+        <div className="lg:hidden mb-4">
+          <Link 
+            href="/jobs" 
+            className="inline-flex h-8 items-center gap-1.5 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-xs font-bold text-zinc-600 transition"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Jobs List
+          </Link>
+        </div>
+
         <StatsGrid 
           totalJobs={totalJobsCount}
           hotJobs={hotJobsCount}
@@ -92,7 +104,7 @@ export default function JobDetailsContainer({
       </div>
 
       {/* Job Header */}
-      <div className="px-6 py-4 bg-white border-y border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 shadow-3xs">
+      <div className="px-4 sm:px-6 py-4 bg-white border-y border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 shadow-3xs">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-base font-bold tracking-tight text-zinc-900">{job.title}</h2>
@@ -143,7 +155,7 @@ export default function JobDetailsContainer({
       </div>
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-zinc-200/80 bg-white px-6 shrink-0">
+      <div className="flex border-b border-zinc-200/80 bg-white px-4 sm:px-6 shrink-0">
         <button 
           className={`py-3 text-xs font-bold border-b-2 transition relative mr-8 ${
             activeTab === 'info' 
@@ -167,7 +179,7 @@ export default function JobDetailsContainer({
       </div>
 
       {/* Content Panel Scroll */}
-      <div className="flex-1 overflow-y-auto p-6 min-h-0">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
         
         {/* Specifications Tab */}
         {activeTab === 'info' && (
