@@ -1,97 +1,97 @@
 # 📄 Job Crawling Report
-**🕒 Time:** `2026-07-19 15:16:04`
+**🕒 Time:** `2026-07-19 17:17:39`
 
 ## 📌 Log Output
 
 ```log
-[15:16:04] 🚀 Starting crawl and save process...
-[15:16:04] 🚀 Starting to crawl all pages...
+[17:17:39] 🚀 Starting crawl and save process...
+[17:17:39] 🚀 Starting to crawl all pages...
 
-[15:16:06] ✓ Crawled page 1 - Found 10 items
-[15:16:06] 📊 Total items: 36
-[15:16:06] 📄 Total pages: 4
-[15:16:06] 📦 Page size: 10
+[17:17:41] ✓ Crawled page 1 - Found 10 items
+[17:17:41] 📊 Total items: 36
+[17:17:41] 📄 Total pages: 4
+[17:17:41] 📦 Page size: 10
 
-[15:16:07] ✓ Crawled page 2 - Found 10 items
-[15:16:09] ✓ Crawled page 3 - Found 10 items
-[15:16:09] ✓ Crawled page 4 - Found 6 items
-[15:16:09] 
+[17:17:42] ✓ Crawled page 2 - Found 10 items
+[17:17:43] ✓ Crawled page 3 - Found 10 items
+[17:17:44] ✓ Crawled page 4 - Found 6 items
+[17:17:44] 
 ✅ Successfully crawled all 4 pages
-[15:16:09] 📊 Total items collected: 36
-[15:16:09] 
+[17:17:44] 📊 Total items collected: 36
+[17:17:44] 
 📈 STATISTICS:
-[15:16:09] ================
-[15:16:09] 📊 Total jobs: 36
-[15:16:09] 📋 Available attributes:
-[15:16:09]    - title: 36 items
-[15:16:09]    - slug: 36 items
-[15:16:09]    - content: 36 items
-[15:16:09]    - salary: 36 items
-[15:16:09]    - application: 36 items
-[15:16:09]    - createdAt: 36 items
-[15:16:09]    - updatedAt: 36 items
-[15:16:09]    - publishedAt: 36 items
-[15:16:09]    - views: 36 items
-[15:16:09]    - job_description: 36 items
-[15:16:09]    - job_requirement: 36 items
-[15:16:09]    - why_you_will_love_working_here: 36 items
-[15:16:09]    - id_job: 36 items
-[15:16:09]    - secondary_email_for_applications: 36 items
-[15:16:09]    - expiry_date_of_application: 36 items
-[15:16:09]    - is_hot: 36 items
-[15:16:09]    - is_new: 36 items
-[15:16:09]    - benefit: 36 items
-[15:16:09]    - min_salary: 36 items
-[15:16:09]    - max_salary: 36 items
-[15:16:09]    - locations: 36 items
-[15:16:09]    - job_categories: 36 items
-[15:16:09]    - job_types: 36 items
-[15:16:09]    - job_applications: 36 items
-[15:16:09]    - one_office_campaign: 36 items
-[15:16:09]    - one_office_position: 36 items
-[15:16:12] ✅ Successfully connected to MongoDB
-[15:16:12] 
+[17:17:44] ================
+[17:17:44] 📊 Total jobs: 36
+[17:17:44] 📋 Available attributes:
+[17:17:44]    - title: 36 items
+[17:17:44]    - slug: 36 items
+[17:17:44]    - content: 36 items
+[17:17:44]    - salary: 36 items
+[17:17:44]    - application: 36 items
+[17:17:44]    - createdAt: 36 items
+[17:17:44]    - updatedAt: 36 items
+[17:17:44]    - publishedAt: 36 items
+[17:17:44]    - views: 36 items
+[17:17:44]    - job_description: 36 items
+[17:17:44]    - job_requirement: 36 items
+[17:17:44]    - why_you_will_love_working_here: 36 items
+[17:17:44]    - id_job: 36 items
+[17:17:44]    - secondary_email_for_applications: 36 items
+[17:17:44]    - expiry_date_of_application: 36 items
+[17:17:44]    - is_hot: 36 items
+[17:17:44]    - is_new: 36 items
+[17:17:44]    - benefit: 36 items
+[17:17:44]    - min_salary: 36 items
+[17:17:44]    - max_salary: 36 items
+[17:17:44]    - locations: 36 items
+[17:17:44]    - job_categories: 36 items
+[17:17:44]    - job_types: 36 items
+[17:17:44]    - job_applications: 36 items
+[17:17:44]    - one_office_campaign: 36 items
+[17:17:44]    - one_office_position: 36 items
+[17:17:46] ✅ Successfully connected to MongoDB
+[17:17:46] 
 🔄 Saving 36 jobs to MongoDB...
-[15:16:12] [~] Cập nhật job: job-179 - Không có ứng viên mới
-[15:16:13] [~] Cập nhật job: job-178 - Không có ứng viên mới
-[15:16:13] [~] Cập nhật job: job-177 - Không có ứng viên mới
-[15:16:14] [~] Cập nhật job: job-152 - Không có ứng viên mới
-[15:16:14] [~] Cập nhật job: job-176 - Không có ứng viên mới
-[15:16:15] [~] Cập nhật job: job-168 - Không có ứng viên mới
-[15:16:15] [~] Cập nhật job: job-175 - Không có ứng viên mới
-[15:16:15] [~] Cập nhật job: job-174 - Không có ứng viên mới
-[15:16:16] [~] Cập nhật job: job-173 - Không có ứng viên mới
-[15:16:17] [~] Cập nhật job: job-172 - Không có ứng viên mới
-[15:16:17] [~] Cập nhật job: job-171 - Không có ứng viên mới
-[15:16:17] [~] Cập nhật job: hcm-senior-l-and-od-specialist-team-lead - Không có ứng viên mới
-[15:16:18] [~] Cập nhật job: job-169 - Không có ứng viên mới
-[15:16:19] [~] Cập nhật job: job-170 - Không có ứng viên mới
-[15:16:20] [~] Cập nhật job: hcm-accounts-payable-intern-2 - Không có ứng viên mới
-[15:16:21] [~] Cập nhật job: hcm-nhan-vien-ke-toan-thanh-toan - Không có ứng viên mới
-[15:16:22] [~] Cập nhật job: hcm-data-analyst-fa-team-1 - Không có ứng viên mới
-[15:16:23] [~] Cập nhật job: hcm-product-owner-user-app-1 - Không có ứng viên mới
-[15:16:23] [~] Cập nhật job: job-167 - Không có ứng viên mới
-[15:16:23] [~] Cập nhật job: job-23-bd-mp - Không có ứng viên mới
-[15:16:24] [~] Cập nhật job: job-127 - Không có ứng viên mới
-[15:16:24] [~] Cập nhật job: job-153 - Không có ứng viên mới
-[15:16:25] [~] Cập nhật job: job-165 - Không có ứng viên mới
-[15:16:26] [~] Cập nhật job: hcm-enterprise-bd - Không có ứng viên mới
-[15:16:26] [~] Cập nhật job: job-161 - Không có ứng viên mới
-[15:16:26] [~] Cập nhật job: job-159 - Không có ứng viên mới
-[15:16:27] [~] Cập nhật job: job-158 - Không có ứng viên mới
-[15:16:27] [~] Cập nhật job: job-147-b2b-ctv-hcm - Không có ứng viên mới
-[15:16:28] [~] Cập nhật job: job-155 - Không có ứng viên mới
-[15:16:28] [~] Cập nhật job: job-154 - Không có ứng viên mới
-[15:16:28] [~] Cập nhật job: job-146 - Không có ứng viên mới
-[15:16:29] [~] Cập nhật job: job-148 - Không có ứng viên mới
-[15:16:29] [~] Cập nhật job: job-BA-ENT - Không có ứng viên mới
-[15:16:30] [~] Cập nhật job: job-145 - Không có ứng viên mới
-[15:16:30] [~] Cập nhật job: han-ctv-kinh-doanh - Không có ứng viên mới
-[15:16:31] [~] Cập nhật job: hcm-cong-tac-vien-kinh-doanh - Không có ứng viên mới
-[15:16:31] ✅ Successfully saved all jobs to MongoDB
-[15:16:31] 
-📊 Tổng ứng viên mới hôm nay (2026-07-19): 50
-[15:16:31] 
+[17:17:46] [~] Cập nhật job: job-179 - Không có ứng viên mới
+[17:17:46] [~] Cập nhật job: job-178 - Không có ứng viên mới
+[17:17:47] [~] Cập nhật job: job-177 - Không có ứng viên mới
+[17:17:47] [~] Cập nhật job: job-152 - Không có ứng viên mới
+[17:17:47] [~] Cập nhật job: job-176 - Không có ứng viên mới
+[17:17:48] [~] Cập nhật job: job-168 - Không có ứng viên mới
+[17:17:48] [~] Cập nhật job: job-175 - Không có ứng viên mới
+[17:17:48] [~] Cập nhật job: job-174 - Không có ứng viên mới
+[17:17:49] [~] Cập nhật job: job-173 - Không có ứng viên mới
+[17:17:49] [~] Cập nhật job: job-172 - Không có ứng viên mới
+[17:17:50] [~] Cập nhật job: job-171 - Không có ứng viên mới
+[17:17:50] [~] Cập nhật job: hcm-senior-l-and-od-specialist-team-lead - Không có ứng viên mới
+[17:17:50] [~] Cập nhật job: job-169 - Thêm 1 ứng viên mới
+[17:17:50] [~] Cập nhật job: job-170 - Không có ứng viên mới
+[17:17:51] [~] Cập nhật job: hcm-accounts-payable-intern-2 - Không có ứng viên mới
+[17:17:51] [~] Cập nhật job: hcm-nhan-vien-ke-toan-thanh-toan - Không có ứng viên mới
+[17:17:52] [~] Cập nhật job: hcm-data-analyst-fa-team-1 - Không có ứng viên mới
+[17:17:52] [~] Cập nhật job: hcm-product-owner-user-app-1 - Không có ứng viên mới
+[17:17:52] [~] Cập nhật job: job-167 - Không có ứng viên mới
+[17:17:53] [~] Cập nhật job: job-23-bd-mp - Không có ứng viên mới
+[17:17:53] [~] Cập nhật job: job-127 - Không có ứng viên mới
+[17:17:53] [~] Cập nhật job: job-153 - Không có ứng viên mới
+[17:17:54] [~] Cập nhật job: job-165 - Không có ứng viên mới
+[17:17:54] [~] Cập nhật job: hcm-enterprise-bd - Không có ứng viên mới
+[17:17:54] [~] Cập nhật job: job-161 - Không có ứng viên mới
+[17:17:55] [~] Cập nhật job: job-159 - Không có ứng viên mới
+[17:17:55] [~] Cập nhật job: job-158 - Không có ứng viên mới
+[17:17:55] [~] Cập nhật job: job-147-b2b-ctv-hcm - Không có ứng viên mới
+[17:17:56] [~] Cập nhật job: job-155 - Không có ứng viên mới
+[17:17:56] [~] Cập nhật job: job-154 - Không có ứng viên mới
+[17:17:56] [~] Cập nhật job: job-146 - Không có ứng viên mới
+[17:17:57] [~] Cập nhật job: job-148 - Không có ứng viên mới
+[17:17:57] [~] Cập nhật job: job-BA-ENT - Không có ứng viên mới
+[17:17:57] [~] Cập nhật job: job-145 - Không có ứng viên mới
+[17:17:58] [~] Cập nhật job: han-ctv-kinh-doanh - Không có ứng viên mới
+[17:17:58] [~] Cập nhật job: hcm-cong-tac-vien-kinh-doanh - Không có ứng viên mới
+[17:17:58] ✅ Successfully saved all jobs to MongoDB
+[17:17:58] 
+📊 Tổng ứng viên mới hôm nay (2026-07-19): 87
+[17:17:58] 
 🎉 Process completed successfully!
 
 ```
